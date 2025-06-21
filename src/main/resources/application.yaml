@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/batch_demo?rewriteBatchedStatements=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.179.128:3308/spring_batch_demo?rewriteBatchedStatements=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
-    password: yourpassword
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
   batch:
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
     job:
-      enabled: true
+      enabled: false
