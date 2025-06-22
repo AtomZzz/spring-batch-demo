@@ -55,7 +55,7 @@ public class BatchConfig {
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        int corePoolSize = Runtime.getRuntime().availableProcessors();
+        int corePoolSize = Runtime.getRuntime().availableProcessors() / 2;
         executor.setCorePoolSize(corePoolSize);
         executor.setMaxPoolSize(50);
         executor.setQueueCapacity(100);
@@ -70,7 +70,7 @@ public class BatchConfig {
     @Bean(name = "slaveStep")
     public Step slaveStep() {
         TaskletStep slaveStep = new StepBuilder("slaveStep", jobRepository)
-                .<User, User>chunk(500, transactionManager)
+                .<User, User>chunk(10000, transactionManager)
                 .reader(fileItemReader(null))
                 .processor(userProcessor(null))
                 .writer(jdbcBatchItemWriterProxy)
@@ -124,7 +124,7 @@ public class BatchConfig {
                 .name("userItemReader")
                 .resource(new FileSystemResource(filePath))  // 修改为 ClassPathResource
                 .delimited()
-                .names("id","name", "email")
+                .names("id", "name", "email")
                 .linesToSkip(1) // 跳过CSV表头
                 .fieldSetMapper(new BeanWrapperFieldSetMapper<>() {{
                     setTargetType(User.class);

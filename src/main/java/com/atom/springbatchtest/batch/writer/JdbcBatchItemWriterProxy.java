@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class JdbcBatchItemWriterProxy implements ItemWriter<User> {
@@ -35,6 +36,7 @@ public class JdbcBatchItemWriterProxy implements ItemWriter<User> {
 
     @Override
     public void write(Chunk<? extends User> chunk) throws Exception {
+        TimeUnit.SECONDS.sleep(5);
         List<? extends User> items = chunk.getItems();
         delegate.write(chunk);
         // 添加写入统计日志
