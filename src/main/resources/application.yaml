@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       data-source-properties:
-        #rewriteBatchedStatements: true  this one already exists in url， can check whether working by mysql log
+        #rewriteBatchedStatements: true  this one already exists in url， can check whether working by mysql log。 it's a huge improvement,the time cost from start to finish is reduced by one sixth
         cachePrepStmts: true
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
