@@ -5,7 +5,12 @@ spring:
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      maximum-pool-size: 30                  # 增加连接池大小（根据CPU核心数调整）
+      data-source-properties:
+        #rewriteBatchedStatements: true  this one already exists in url， can check whether working by mysql log
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+      maximum-pool-size: 50                  # 增加连接池大小（根据CPU核心数调整）
       minimum-idle: 10                        # 最小空闲连接数
       connection-timeout: 30000                # 连接超时时间（毫秒）
       max-lifetime: 1800000                   # 连接最大生命周期（30分钟）
@@ -22,6 +27,10 @@ data:
   path: ${user.dir}/src/main/resources/data/
 
 
+logging:
+  level:
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.batch.item.database: DEBUG
 #logging:
 #  level:
 #    org:

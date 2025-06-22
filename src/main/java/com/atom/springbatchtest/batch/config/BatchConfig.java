@@ -1,5 +1,6 @@
 package com.atom.springbatchtest.batch.config;
 
+import com.atom.springbatchtest.batch.listener.JobListener;
 import com.atom.springbatchtest.batch.model.User;
 import com.atom.springbatchtest.batch.partition.FilePartitioner;
 import com.atom.springbatchtest.batch.writer.JdbcBatchItemWriterProxy;
@@ -70,7 +71,7 @@ public class BatchConfig {
     @Bean(name = "slaveStep")
     public Step slaveStep() {
         TaskletStep slaveStep = new StepBuilder("slaveStep", jobRepository)
-                .<User, User>chunk(10000, transactionManager)
+                .<User, User>chunk(30000, transactionManager)
                 .reader(fileItemReader(null))
                 .processor(userProcessor(null))
                 .writer(jdbcBatchItemWriterProxy)
@@ -106,10 +107,11 @@ public class BatchConfig {
 
     // 5. 作业配置
     @Bean
-    public Job fileProcessingJob(@Autowired @Qualifier("masterStep") Step maserStep) {
+    public Job fileProcessingJob(@Qualifier("masterStep") Step maserStep, JobListener jobListener) {
         return new JobBuilder("multiFileJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(maserStep)
+                .listener(jobListener)
                 .build();
     }
 
