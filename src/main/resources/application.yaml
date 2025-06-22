@@ -9,3 +9,14 @@ spring:
       initialize-schema: never
     job:
       enabled: false
+
+data:
+  path: ${user.dir}/src/main/resources/data/
+
+
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        batch: DEBUG
+
