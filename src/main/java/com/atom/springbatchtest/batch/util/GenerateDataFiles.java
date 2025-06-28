@@ -7,15 +7,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GenerateDataFiles {
 
-    private static final String OUTPUT_DIR = "src/main/resources/data/";
+    private static final String OUTPUT_DIR = "src/main/resources/data/virtualTest/";
 
     private static final AtomicInteger id = new AtomicInteger(0);
 
     public static void main(String[] args) {
-        for (int i = 1; i <= 5; i++){
+        for (int i = 1; i <= 50; i++){
             int finalI = i;
             new Thread(() -> {
-                generateFile(OUTPUT_DIR + "data" + finalI + ".csv", 100000);
+                generateFile(OUTPUT_DIR + "data" + finalI + ".csv", 10000);
             }).start();
         }
     }

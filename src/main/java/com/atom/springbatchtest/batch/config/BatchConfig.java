@@ -31,10 +31,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,7 +56,7 @@ public class BatchConfig {
     private JdbcBatchItemWriterProxy jdbcBatchItemWriterProxy;
 
     // 1. 线程池配置
-    @Bean
+    @Bean("taskExecutor")
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         int corePoolSize = Runtime.getRuntime().availableProcessors() / 2;
@@ -64,6 +67,12 @@ public class BatchConfig {
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy()); // 设置拒绝策略
         executor.initialize();
         return executor;
+    }
+
+    @Bean("virtualTaskExecutor")
+    public TaskExecutor virtualTaskExecutor() {
+        ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+        return new TaskExecutorAdapter(executorService);
     }
 
 
@@ -96,7 +105,7 @@ public class BatchConfig {
 
     @Bean
     public PartitionHandler partitionHandler(@Autowired @Qualifier("slaveStep") Step slaveStep,
-                                             TaskExecutor taskExecutor) {
+                                             @Qualifier("virtualTaskExecutor") TaskExecutor taskExecutor) {
         var partitionHandler = new TaskExecutorPartitionHandler();
         partitionHandler.setStep(slaveStep);
         partitionHandler.setTaskExecutor(taskExecutor);
@@ -120,6 +129,7 @@ public class BatchConfig {
     @StepScope
     public FlatFileItemReader<User> fileItemReader(@Value("#{stepExecutionContext['filePath']}") String filePath) {
         System.out.println("===== 正在创建文件读取器 =====");
+        System.out.println("是否虚拟线程："+Thread.currentThread().isVirtual());
         System.out.println("线程: " + Thread.currentThread().getName());
         System.out.println("文件路径: " + filePath);
         return new FlatFileItemReaderBuilder<User>()
